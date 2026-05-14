@@ -1,0 +1,1429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Foothill Feed · Daily HQ</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green: #2D5233;
+    --green-light: #3d6b44;
+    --green-pale: #eaf2eb;
+    --green-mid: #c2dbc5;
+    --amber: #c17d28;
+    --amber-pale: #fdf3e3;
+    --amber-mid: #f0cb8a;
+    --red: #8b2e2e;
+    --red-pale: #fdf0f0;
+    --red-mid: #e8a0a0;
+    --blue: #1e4a7a;
+    --blue-pale: #eef3fa;
+    --blue-mid: #a0bfe8;
+    --purple: #5a3a8a;
+    --purple-pale: #f3edf8;
+    --cream: #f8f6f1;
+    --ink: #1a1a18;
+    --ink-mid: #4a4a46;
+    --ink-light: #8a8a84;
+    --border: #dedad4;
+    --white: #ffffff;
+    --shadow: 0 1px 4px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--ink); min-height: 100vh; font-size: 14px; line-height: 1.5; }
+
+  .topbar { background: var(--green); color: white; padding: 0 1.5rem; height: 54px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+  .logo { font-family: 'DM Serif Display', serif; font-size: 18px; }
+  .logo span { opacity: 0.55; font-size: 12px; font-family: 'DM Sans', sans-serif; font-weight: 300; margin-left: 8px; }
+  .mode-badge { padding: 4px 14px; border-radius: 99px; font-size: 12px; font-weight: 500; border: 1.5px solid rgba(255,255,255,0.3); }
+  .mode-ceo { background: rgba(255,255,255,0.18); color: white; }
+  .mode-floor { background: rgba(253,230,138,0.2); color: #fde68a; border-color: rgba(253,230,138,0.4); }
+  .topbar-right { display: flex; align-items: center; gap: 12px; }
+  .topbar-date { font-family: 'DM Mono', monospace; font-size: 11px; opacity: 0.6; }
+  .focus-pill { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 99px; padding: 5px 16px; font-size: 12px; font-style: italic; cursor: pointer; min-width: 200px; text-align: center; outline: none; color: white; }
+  .focus-pill:focus { background: rgba(255,255,255,0.2); }
+
+  .main { display: grid; grid-template-columns: 270px 1fr 270px; gap: 1.1rem; padding: 1.1rem 1.25rem; max-width: 1400px; margin: 0 auto; }
+  @media (max-width: 1080px) { .main { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 680px) { .main { grid-template-columns: 1fr; } }
+
+  .card { background: var(--white); border: 1px solid var(--border); border-radius: 12px; padding: 1rem 1.15rem; box-shadow: var(--shadow); margin-bottom: 1.1rem; }
+  .card:last-child { margin-bottom: 0; }
+  .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; padding-bottom: 0.6rem; border-bottom: 1px solid var(--border); }
+  .card-title { font-family: 'DM Serif Display', serif; font-size: 15px; display: flex; align-items: center; gap: 6px; }
+  .card-meta { font-size: 11px; color: var(--ink-light); font-family: 'DM Mono', monospace; }
+
+  .briefing { background: var(--green); color: white; border: none; }
+  .briefing .card-header { border-color: rgba(255,255,255,0.12); }
+  .briefing .card-title { color: white; }
+  .briefing .card-meta { color: rgba(255,255,255,0.45); }
+  .brief-day { font-family: 'DM Serif Display', serif; font-size: 28px; line-height: 1.1; }
+  .brief-date { font-size: 11px; opacity: 0.55; font-family: 'DM Mono', monospace; margin-bottom: 10px; }
+  .brief-mode { font-size: 12px; padding: 6px 12px; border-radius: 8px; margin-bottom: 10px; font-weight: 500; }
+  .brief-mode.ceo { background: rgba(255,255,255,0.12); }
+  .brief-mode.floor { background: rgba(253,230,138,0.12); color: #fde68a; }
+  .brief-quote { font-style: italic; font-size: 12px; opacity: 0.7; line-height: 1.6; border-left: 2px solid rgba(255,255,255,0.25); padding-left: 10px; margin-bottom: 12px; }
+  .brief-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+  .bstat { background: rgba(255,255,255,0.09); border-radius: 8px; padding: 8px 10px; text-align: center; }
+  .bstat-num { font-family: 'DM Mono', monospace; font-size: 18px; }
+  .bstat-label { font-size: 10px; opacity: 0.55; margin-top: 1px; }
+
+  .alert { border-radius: 8px; padding: 8px 12px; font-size: 12px; margin-bottom: 7px; display: flex; align-items: flex-start; gap: 8px; }
+  .alert-red { background: var(--red-pale); color: var(--red); border: 1px solid var(--red-mid); }
+  .alert-amber { background: var(--amber-pale); color: var(--amber); border: 1px solid var(--amber-mid); }
+  .alert-blue { background: var(--blue-pale); color: var(--blue); border: 1px solid var(--blue-mid); }
+  .alert-green { background: var(--green-pale); color: var(--green); border: 1px solid var(--green-mid); }
+  .alert-icon { flex-shrink: 0; }
+
+  /* VENDOR TABLE */
+  .vtable { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .vtable th { font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-light); text-align: left; padding: 0 6px 6px; border-bottom: 1px solid var(--border); }
+  .vtable td { padding: 7px 6px; border-bottom: 1px solid #f0ede8; vertical-align: middle; }
+  .vtable tr:last-child td { border-bottom: none; }
+  .vtable tr.skipped td { opacity: 0.4; }
+  .vname { font-weight: 500; color: var(--ink); }
+  .vstaff { font-size: 10px; color: var(--blue); background: var(--blue-pale); padding: 1px 6px; border-radius: 99px; margin-left: 4px; }
+  .vdue { font-family: 'DM Mono', monospace; font-size: 11px; padding: 2px 8px; border-radius: 99px; white-space: nowrap; }
+  .due-today { background: var(--red-pale); color: var(--red); font-weight: 500; }
+  .due-soon { background: var(--amber-pale); color: var(--amber); }
+  .due-ok { background: var(--green-pale); color: var(--green); }
+  .due-eow { background: var(--blue-pale); color: var(--blue); }
+  .due-skip { background: #f0ede8; color: var(--ink-light); }
+
+  /* BIWEEKLY TOGGLE */
+  .skip-toggle { font-size: 10px; color: var(--ink-light); cursor: pointer; background: none; border: 1px solid var(--border); border-radius: 99px; padding: 1px 7px; margin-left: 4px; font-family: 'DM Sans', sans-serif; white-space: nowrap; }
+  .skip-toggle:hover { border-color: var(--ink-light); }
+  .skip-toggle.active { background: var(--amber-pale); color: var(--amber); border-color: var(--amber-mid); }
+
+  /* RECURRING */
+  .rec-row { display: flex; align-items: center; gap: 10px; padding: 7px 0; border-bottom: 1px solid #f0ede8; font-size: 12px; }
+  .rec-row:last-child { border-bottom: none; }
+  .rec-name { flex: 1; font-weight: 500; }
+  .rec-when { font-size: 11px; color: var(--ink-light); }
+  .rec-badge { font-size: 10px; padding: 2px 8px; border-radius: 99px; white-space: nowrap; }
+
+  /* TASKS */
+  .task-list { list-style: none; }
+  .task-item { display: flex; align-items: flex-start; gap: 9px; padding: 6px 0; border-bottom: 1px solid #f0ede8; cursor: pointer; user-select: none; }
+  .task-item:last-child { border-bottom: none; padding-bottom: 0; }
+  .task-item:first-child { padding-top: 0; }
+  .task-item.done { opacity: 0.38; }
+  .task-item.done .task-text { text-decoration: line-through; }
+  .task-check { width: 17px; height: 17px; border: 1.5px solid var(--border); border-radius: 4px; flex-shrink: 0; margin-top: 2px; display: flex; align-items: center; justify-content: center; transition: all 0.15s; background: white; font-size: 10px; color: white; }
+  .task-item.done .task-check { background: var(--green); border-color: var(--green); }
+  .task-text { flex: 1; font-size: 13px; line-height: 1.4; }
+  .task-tag { font-size: 10px; padding: 2px 7px; border-radius: 99px; font-weight: 500; white-space: nowrap; flex-shrink: 0; }
+  .tag-ops { background: var(--green-pale); color: var(--green); }
+  .tag-staff { background: var(--blue-pale); color: var(--blue); }
+  .tag-money { background: var(--amber-pale); color: var(--amber); }
+  .tag-urgent { background: var(--red-pale); color: var(--red); }
+  .tag-hire { background: var(--purple-pale); color: var(--purple); }
+
+  .sdiv { font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-light); margin: 11px 0 7px; display: flex; align-items: center; gap: 8px; }
+  .sdiv::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  .add-row { display: flex; gap: 6px; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
+  .add-row input { flex: 1; border: 1px solid var(--border); border-radius: 7px; padding: 6px 10px; font-family: 'DM Sans', sans-serif; font-size: 12px; color: var(--ink); background: var(--cream); outline: none; }
+  .add-row input:focus { border-color: var(--green); }
+  .add-row select { border: 1px solid var(--border); border-radius: 7px; padding: 6px; font-family: 'DM Sans', sans-serif; font-size: 11px; background: var(--cream); outline: none; color: var(--ink); }
+  .add-btn { background: var(--green); color: white; border: none; border-radius: 7px; padding: 6px 14px; font-size: 13px; cursor: pointer; white-space: nowrap; }
+  .add-btn:hover { background: var(--green-light); }
+
+  .triage-row { display: flex; align-items: flex-start; gap: 9px; padding: 7px 10px; border-radius: 8px; margin-bottom: 5px; background: var(--cream); font-size: 12px; cursor: pointer; border: 1px solid transparent; }
+  .triage-row:hover { border-color: var(--border); }
+  .triage-row.done { opacity: 0.38; }
+  .triage-check { width: 16px; height: 16px; border: 1.5px solid var(--border); border-radius: 3px; flex-shrink: 0; margin-top: 1px; display: flex; align-items: center; justify-content: center; font-size: 10px; background: white; color: white; }
+  .triage-row.done .triage-check { background: var(--green); border-color: var(--green); }
+  .triage-sub { font-size: 10px; color: var(--ink-light); margin-top: 1px; }
+
+  .proj-item { padding: 8px 0; border-bottom: 1px solid #f0ede8; }
+  .proj-item:last-child { border-bottom: none; }
+  .proj-header { display: flex; align-items: center; gap: 7px; margin-bottom: 4px; }
+  .proj-name { font-size: 13px; font-weight: 500; flex: 1; }
+  .proj-status { font-size: 10px; padding: 2px 8px; border-radius: 99px; font-weight: 500; }
+  .ps-active { background: var(--green-pale); color: var(--green); }
+  .ps-pending { background: var(--amber-pale); color: var(--amber); }
+  .ps-hold { background: var(--blue-pale); color: var(--blue); }
+  .proj-bar { height: 3px; background: #eee; border-radius: 99px; overflow: hidden; }
+  .proj-fill { height: 100%; border-radius: 99px; background: var(--green); }
+  .proj-note { font-size: 11px; color: var(--ink-light); margin-top: 3px; }
+
+  .claude-box { border: 1.5px solid var(--green-mid); border-radius: 10px; padding: 12px; background: var(--green-pale); }
+  .claude-label { font-size: 11px; font-weight: 500; color: var(--green); margin-bottom: 7px; }
+  .claude-ta { width: 100%; border: 1px solid var(--green-mid); border-radius: 7px; padding: 8px 10px; font-family: 'DM Sans', sans-serif; font-size: 12px; color: var(--ink); background: white; resize: vertical; min-height: 70px; outline: none; }
+  .claude-ta:focus { border-color: var(--green); }
+  .claude-copy { width: 100%; background: var(--green); color: white; border: none; border-radius: 7px; padding: 8px; font-size: 12px; cursor: pointer; font-family: 'DM Sans', sans-serif; margin-top: 8px; }
+  .claude-copy:hover { background: var(--green-light); }
+  .claude-hint { font-size: 10px; color: var(--ink-light); margin-top: 7px; line-height: 1.5; }
+
+  .capture-area { width: 100%; border: 1px solid var(--border); border-radius: 8px; padding: 10px; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--ink); background: var(--cream); resize: vertical; min-height: 75px; outline: none; }
+  .capture-area:focus { border-color: var(--green); }
+  .cap-actions { display: flex; gap: 6px; margin-top: 7px; justify-content: flex-end; }
+  .cap-btn { padding: 5px 12px; border-radius: 7px; font-size: 11px; cursor: pointer; font-family: 'DM Sans', sans-serif; border: 1px solid var(--border); background: white; color: var(--ink-mid); }
+  .cap-btn.primary { background: var(--green); color: white; border-color: var(--green); }
+  .note-entry { padding: 7px 10px; background: var(--cream); border-radius: 7px; margin-bottom: 5px; font-size: 12px; color: var(--ink-mid); display: flex; gap: 8px; align-items: flex-start; }
+  .note-time { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--ink-light); white-space: nowrap; padding-top: 1px; }
+  .note-del { margin-left: auto; color: var(--ink-light); cursor: pointer; font-size: 15px; line-height: 1; flex-shrink: 0; }
+  .note-del:hover { color: var(--red); }
+
+  .week-strip { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; margin-bottom: 10px; }
+  .wday { text-align: center; padding: 5px 3px; border-radius: 7px; font-size: 11px; border: 1px solid transparent; }
+  .wday .wdn { font-size: 9px; color: var(--ink-light); text-transform: uppercase; letter-spacing: 0.04em; }
+  .wday .wdd { font-family: 'DM Mono', monospace; font-size: 13px; margin-top: 1px; }
+  .wday.today { background: var(--green); color: white; }
+  .wday.today .wdn { color: rgba(255,255,255,0.6); }
+  .wday.rick { border-color: var(--green-mid); background: var(--green-pale); }
+  .wday.rick .wdn { color: var(--green); }
+
+  .reset-btn { font-size: 10px; color: var(--ink-light); cursor: pointer; background: none; border: none; padding: 0; font-family: 'DM Sans', sans-serif; }
+  .reset-btn:hover { color: var(--red); }
+  .coach-chip { font-size: 11px; padding: 5px 12px; border-radius: 99px; border: 1.5px solid var(--green-mid); background: white; color: var(--green); cursor: pointer; font-family: 'DM Sans', sans-serif; font-weight: 500; transition: all 0.15s; }
+  .coach-chip:hover { background: var(--green-pale); }
+  .coach-section { margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid #f0ede8; }
+  .coach-section:last-child { border-bottom: none; margin-bottom: 0; }
+  .coach-section-label { font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-light); margin-bottom: 5px; }
+  .coach-priority { display: flex; gap: 8px; align-items: flex-start; padding: 4px 0; font-size: 13px; }
+  .coach-num { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--green); font-weight: 500; width: 16px; flex-shrink: 0; padding-top: 2px; }
+
+  /* CALENDAR */
+  .cal-day-block { margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid #f0ede8; }
+  .cal-day-block:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .cal-day-label { font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-light); margin-bottom: 5px; display: flex; align-items: center; gap: 6px; }
+  .cal-day-label.today-label { color: var(--green); }
+  .cal-event { display: flex; align-items: flex-start; gap: 8px; padding: 5px 8px; border-radius: 7px; margin-bottom: 3px; font-size: 12px; }
+  .cal-event:last-child { margin-bottom: 0; }
+  .cal-event-time { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--ink-light); white-space: nowrap; padding-top: 1px; min-width: 36px; }
+  .cal-event-title { flex: 1; font-size: 12px; color: var(--ink); }
+  .cal-event.vendor-event { background: var(--amber-pale); }
+  .cal-event.vendor-event .cal-event-title { color: var(--amber); font-weight: 500; }
+  .cal-event.money-event { background: var(--red-pale); }
+  .cal-event.money-event .cal-event-title { color: var(--red); font-weight: 500; }
+  .cal-event.regular-event { background: var(--blue-pale); }
+  .cal-event.regular-event .cal-event-title { color: var(--blue); }
+  .cal-empty { font-size: 11px; color: var(--ink-light); font-style: italic; padding: 4px 0; }
+  .cal-loading { text-align: center; padding: 16px; font-size: 12px; color: var(--ink-light); }
+  .cal-error { font-size: 11px; color: var(--red); background: var(--red-pale); border-radius: 7px; padding: 8px 10px; }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+  .card { animation: fadeIn 0.25s ease both; }
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo">Foothill Feed <span>Daily HQ</span></div>
+  <div class="mode-badge" id="modeBadge"></div>
+  <div class="topbar-right">
+    <div id="syncBadge" style="font-family:'DM Mono',monospace;font-size:10px;color:rgba(255,255,255,0.4);white-space:nowrap">○ Connecting…</div>
+    <div class="focus-pill" id="focusPill" contenteditable="true" spellcheck="false">☀️ What's the one thing today?</div>
+    <div class="topbar-date" id="topDate"></div>
+  </div>
+</div>
+
+<div class="main">
+
+<!-- ═══ LEFT ═══ -->
+<div>
+
+  <div class="card briefing">
+    <div class="card-header">
+      <div class="card-title">Morning Briefing</div>
+      <div class="card-meta" id="weekLabel"></div>
+    </div>
+    <div class="brief-day" id="briefDay"></div>
+    <div class="brief-date" id="briefDate"></div>
+    <div class="brief-mode" id="briefMode"></div>
+    <div class="brief-quote" id="briefQuote"></div>
+    <div class="brief-stats">
+      <div class="bstat"><div class="bstat-num" id="statD">—</div><div class="bstat-label">Daily done</div></div>
+      <div class="bstat"><div class="bstat-num" id="statW">—</div><div class="bstat-label">Weekly done</div></div>
+    </div>
+  </div>
+
+  <!-- JEFF'S MOTIVATION -->
+  <div class="card" style="border-color:var(--green-mid);background:linear-gradient(135deg,#fff 60%,var(--green-pale))">
+    <div class="card-header">
+      <div class="card-title" style="color:var(--green)">🌱 Your Daily Fuel</div>
+      <button class="reset-btn" onclick="refreshMotivation()" style="color:var(--green);opacity:0.6">↻ refresh</button>
+    </div>
+    <div id="jeffMotivationText" style="font-size:14px;line-height:1.7;color:var(--ink);font-style:italic;min-height:60px">
+      <span style="color:var(--ink-light);font-size:12px">Loading…</span>
+    </div>
+  </div>
+
+  <!-- STAFF MOTIVATION -->
+  <div class="card" style="border-color:var(--blue-mid)">
+    <div class="card-header">
+      <div class="card-title" style="color:var(--blue)">👥 Team Message</div>
+      <button class="reset-btn" onclick="refreshStaffMotivation()" style="color:var(--blue);opacity:0.6">↻ refresh</button>
+    </div>
+    <p style="font-size:11px;color:var(--ink-light);margin-bottom:10px">Read this at the start of shift, post it, or text it to the group.</p>
+    <div id="staffMotivationHeadline" style="font-size:15px;font-weight:500;color:var(--ink);margin-bottom:6px;min-height:24px">
+      <span style="color:var(--ink-light);font-size:12px">Loading…</span>
+    </div>
+    <div id="staffMotivationSub" style="font-size:13px;color:var(--ink-mid);line-height:1.6;min-height:40px"></div>
+    <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border);display:flex;gap:6px">
+      <button class="add-btn" onclick="copyStaffMessage()" style="font-size:11px;padding:6px 14px">📋 Copy to share</button>
+      <div id="staffCopyConfirm" style="font-size:11px;color:var(--green);display:none;align-items:center">✓ Copied!</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">📅 This Week</div>
+      <div class="card-meta" id="weekRange"></div>
+    </div>
+    <div class="week-strip" id="weekStrip"></div>
+    <div style="font-size:10px;color:var(--ink-light)">
+      <span style="display:inline-block;width:10px;height:10px;background:var(--green-pale);border:1px solid var(--green-mid);border-radius:2px;vertical-align:middle;margin-right:4px"></span>Rick in (Tue–Wed) = CEO time
+    </div>
+  </div>
+
+  <div class="card" id="calCard">
+    <div class="card-header">
+      <div class="card-title" style="color:var(--blue)">🗓 Google Calendar</div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <button class="reset-btn" onclick="loadCalendar(true)" style="color:var(--blue);opacity:0.7">↻ refresh</button>
+        <div class="card-meta" id="calStatus">Loading…</div>
+      </div>
+    </div>
+    <div id="calBody"><div class="cal-loading">⏳ Fetching your calendar…</div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">📦 Vendor Orders</div>
+      <div class="card-meta" id="vendorCount"></div>
+    </div>
+    <div id="vendorAlerts"></div>
+    <table class="vtable">
+      <thead><tr><th>Vendor</th><th>Deadline</th><th>Due</th></tr></thead>
+      <tbody id="vendorBody"></tbody>
+    </table>
+    <div style="margin-top:10px;font-size:10px;color:var(--ink-light);line-height:1.6">
+      Toggle <strong>skip wk</strong> on biweekly vendors when it's their off week.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">🔁 Recurring</div>
+      <div class="card-meta">Payroll · Rent · Admin</div>
+    </div>
+    <div id="recurringAlerts"></div>
+    <div id="recurringList"></div>
+  </div>
+
+</div>
+
+<!-- ═══ CENTER ═══ -->
+<div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">✅ Today's Tasks</div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <button class="reset-btn" onclick="resetDaily()">Reset</button>
+        <div class="card-meta" id="dailyProg"></div>
+      </div>
+    </div>
+    <div id="dayAlerts"></div>
+    <div class="sdiv">Morning anchor</div>
+    <ul class="task-list" id="morningList"></ul>
+    <div class="sdiv">Store ops</div>
+    <ul class="task-list" id="opsList"></ul>
+    <div class="sdiv">End of day</div>
+    <ul class="task-list" id="eodList"></ul>
+    <div class="add-row">
+      <input type="text" id="dailyInput" placeholder="Add today's task…" onkeydown="if(event.key==='Enter')addDaily()">
+      <select id="dailyTag">
+        <option value="ops">Ops</option>
+        <option value="staff">Staff</option>
+        <option value="money">Money</option>
+        <option value="hire">Hire</option>
+        <option value="urgent">Urgent</option>
+      </select>
+      <div class="add-btn" onclick="addDaily()">+</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">📧 Email Triage</div>
+      <div class="card-meta">Once a day · 15 min</div>
+    </div>
+    <p style="font-size:12px;color:var(--ink-light);margin-bottom:10px">Work through in order. Don't open email outside this window.</p>
+    <div id="triageList"></div>
+    <button class="reset-btn" onclick="resetTriage()" style="margin-top:8px">Reset triage</button>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">🗓 This Week</div>
+      <div class="card-meta" id="weeklyProg"></div>
+    </div>
+    <ul class="task-list" id="weeklyList"></ul>
+    <div class="add-row">
+      <input type="text" id="weeklyInput" placeholder="Add weekly task…" onkeydown="if(event.key==='Enter')addWeekly()">
+      <div class="add-btn" onclick="addWeekly()">+</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">📆 This Month</div>
+      <div class="card-meta" id="monthLabel"></div>
+    </div>
+    <ul class="task-list" id="monthlyList"></ul>
+    <div class="add-row">
+      <input type="text" id="monthlyInput" placeholder="Add monthly task…" onkeydown="if(event.key==='Enter')addMonthly()">
+      <div class="add-btn" onclick="addMonthly()">+</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══ RIGHT ═══ -->
+<div>
+
+  <!-- AI COACH -->
+  <div class="card" id="coachCard" style="border-color:var(--green-mid)">
+    <div class="card-header">
+      <div class="card-title" style="color:var(--green)">🧠 Daily Coach</div>
+      <div class="card-meta" id="coachStatus">Ready</div>
+    </div>
+    <div id="coachBody">
+      <p style="font-size:12px;color:var(--ink-mid);margin-bottom:12px;line-height:1.6">Your chief of staff for the day. One question to get focused.</p>
+      <div style="background:var(--green-pale);border-radius:10px;padding:12px 14px;margin-bottom:12px;font-size:13px;color:var(--green);font-weight:500;line-height:1.6">
+        What's on your mind today —<br>operations, staff, projects, or all of the above?
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+        <button class="coach-chip" onclick="startCoach('operations')">⚙️ Operations</button>
+        <button class="coach-chip" onclick="startCoach('staff')">👥 Staff</button>
+        <button class="coach-chip" onclick="startCoach('projects')">🚀 Projects</button>
+        <button class="coach-chip" onclick="startCoach('all of the above')">🔥 All of it</button>
+      </div>
+      <div style="display:flex;gap:6px">
+        <input type="text" id="coachCustom" placeholder="Or type your own…" style="flex:1;border:1px solid var(--border);border-radius:7px;padding:6px 10px;font-family:'DM Sans',sans-serif;font-size:12px;background:var(--cream);outline:none;color:var(--ink)" onkeydown="if(event.key==='Enter')startCoach(document.getElementById('coachCustom').value)">
+        <button class="add-btn" onclick="startCoach(document.getElementById('coachCustom').value)">→</button>
+      </div>
+    </div>
+    <div id="coachResponse" style="display:none">
+      <div id="coachLoading" style="display:none;text-align:center;padding:20px;font-size:12px;color:var(--ink-light)">
+        <div style="font-size:20px;margin-bottom:6px">⏳</div>Thinking like your chief of staff…
+      </div>
+      <div id="coachOutput" style="font-size:13px;color:var(--ink);line-height:1.7"></div>
+      <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border);display:flex;gap:6px">
+        <button class="coach-chip" onclick="resetCoach()">↩ Start over</button>
+        <button class="coach-chip" onclick="askFollowUp()">💬 Follow up</button>
+      </div>
+      <div id="followUpBox" style="display:none;margin-top:8px">
+        <div style="display:flex;gap:6px">
+          <input type="text" id="followUpInput" placeholder="Ask a follow up…" style="flex:1;border:1px solid var(--border);border-radius:7px;padding:6px 10px;font-family:'DM Sans',sans-serif;font-size:12px;background:var(--cream);outline:none;color:var(--ink)" onkeydown="if(event.key==='Enter')sendFollowUp()">
+          <button class="add-btn" onclick="sendFollowUp()">→</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">🤖 Send to Claude</div>
+      <div class="card-meta">Paste into chat</div>
+    </div>
+    <div class="claude-box">
+      <div class="claude-label">✏️ What do you want to tell or ask Claude?</div>
+      <textarea class="claude-ta" id="claudeMsg" placeholder="e.g. Add a new vendor, tweak a task, ask a question, flag something…"></textarea>
+      <button class="claude-copy" id="claudeCopyBtn" onclick="copyToClaude()">📋 Copy message</button>
+      <div class="claude-hint">Copy → open Claude → paste. Claude will remember it and update the dashboard next time.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">🚀 Projects</div>
+      <div class="card-meta">8 active</div>
+    </div>
+    <div id="projList"></div>
+  </div>
+
+  <div class="card" style="border-color:var(--red-mid)">
+    <div class="card-header">
+      <div class="card-title" style="color:var(--red)">🧑‍💼 Hiring</div>
+      <div class="card-meta" style="color:var(--red)">Urgent</div>
+    </div>
+    <ul class="task-list" id="hiringList"></ul>
+    <div class="add-row">
+      <input type="text" id="hiringInput" placeholder="Add hiring task…" onkeydown="if(event.key==='Enter')addHiring()">
+      <div class="add-btn" onclick="addHiring()">+</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">⚡ Quick Capture</div>
+      <div class="card-meta">Brain dump</div>
+    </div>
+    <textarea class="capture-area" id="captureBox" placeholder="Thought, idea, reminder… drop it here before it's gone."></textarea>
+    <div class="cap-actions">
+      <button class="cap-btn" onclick="document.getElementById('captureBox').value=''">Clear</button>
+      <button class="cap-btn primary" onclick="saveNote()">Save to log ↓</button>
+    </div>
+    <div id="noteLog" style="margin-top:10px"></div>
+  </div>
+
+</div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// FOOTHILL FEED · DAILY HQ · v5.0 — Supabase + GitHub Pages
+// ═══════════════════════════════════════════════════════════════
+
+// ─── CONFIG ────────────────────────────────────────────────────
+const SUPABASE_URL = 'https://fvwqjwbxrgfejkdzbxqi.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ2d3Fqd2J4cmdmZWprZHpieHFpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcwNjgyOTQsImV4cCI6MjA5MjY0NDI5NH0.msbgTznD4y8wisK4u5wMk6ihMVaF4v31zfuPVCR48SA';
+const PROXY_URL    = `${SUPABASE_URL}/functions/v1/anthropic-proxy`;
+const HQ_SECRET    = 'foothillfeed-hq-2026';   // must match Edge Function env var
+const OWNER        = 'jeff';
+
+// ─── CONSTANTS ─────────────────────────────────────────────────
+const DAYS=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+const SHORT_MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+// Summer schedule: CEO days = Tue(2) + Wed(3) only
+const RICK_DAYS=[2,3];
+
+const QUOTES={
+  0:"Sunday — rest is part of the system.",
+  1:"Monday — Farmers order goes in. Your day starts tomorrow.",
+  2:"Tuesday — Rick's in. CEO time. VSI order by 2pm.",
+  3:"Wednesday — last CEO day this week. Bar Ale by 11am, Newco by 2pm.",
+  4:"Thursday — Phillips order by 10am. Floor day — you've got this.",
+  5:"Friday — run the floor. Lead from the front.",
+  6:"Saturday — busiest day. Serve every customer well."
+};
+
+const VENDORS=[
+  {name:"Farmers",  day:1, time:"10am",      freq:"Weekly",         biweekly:false, staffOwner:true },
+  {name:"VSI",      day:2, time:"2pm",        freq:"Weekly",         biweekly:false, staffOwner:false},
+  {name:"Bar Ale",  day:3, time:"11am",       freq:"Every other wk", biweekly:true,  staffOwner:false},
+  {name:"Newco",    day:3, time:"2pm",        freq:"Weekly",         biweekly:false, staffOwner:false},
+  {name:"Phillips", day:4, time:"10am",       freq:"Weekly",         biweekly:false, staffOwner:false},
+  {name:"Volkman",  day:4, time:"Afternoon",  freq:"Every other wk", biweekly:true,  staffOwner:false},
+];
+
+const RECURRING=[
+  {name:"Payroll",                  when:"Every other Tuesday", tag:"money", check:(d,dt)=>d.getDay()===2},
+  {name:"Rent",                     when:"1st & 15th of month", tag:"money", check:(d,dt)=>dt===1||dt===15},
+  {name:"Rick + social media check", when:"1st of month",       tag:"staff", check:(d,dt)=>dt===1},
+];
+
+const CEO_TASKS=[
+  {text:"Check sales vs yesterday",tag:"ops",section:"morning"},
+  {text:"Check in with staff — anything from yesterday?",tag:"staff",section:"morning"},
+  {text:"Triage emails — 15 min max (use email card below)",tag:"ops",section:"morning"},
+  {text:"Do the deposit from yesterday",tag:"money",section:"ops"},
+  {text:"Check & place any vendor orders due today",tag:"ops",section:"ops"},
+  {text:"Process incoming invoices",tag:"money",section:"ops"},
+  {text:"Project work block — Staff Hub or Delivery Day",tag:"ops",section:"ops"},
+  {text:"Check low stock alerts",tag:"ops",section:"ops"},
+  {text:"Cash wrap balanced & closed",tag:"ops",section:"eod"},
+  {text:"Staff debrief — any issues?",tag:"staff",section:"eod"},
+  {text:"Note anything for tomorrow",tag:"ops",section:"eod"},
+];
+const FLOOR_TASKS=[
+  {text:"Check sales vs yesterday",tag:"ops",section:"morning"},
+  {text:"Check in with staff — anything from yesterday?",tag:"staff",section:"morning"},
+  {text:"Walk the store — face, tidy, restock",tag:"ops",section:"morning"},
+  {text:"Handle any customer issues from yesterday",tag:"ops",section:"ops"},
+  {text:"Check incoming orders & deliveries",tag:"ops",section:"ops"},
+  {text:"Check low stock alerts",tag:"ops",section:"ops"},
+  {text:"Quick email scan — urgent only (5 min)",tag:"ops",section:"ops"},
+  {text:"Cash wrap balanced & closed",tag:"ops",section:"eod"},
+  {text:"Staff debrief — any issues?",tag:"staff",section:"eod"},
+  {text:"Note anything for tomorrow",tag:"ops",section:"eod"},
+];
+
+const WEEKLY_DEFAULT=[
+  {text:"Review weekly sales vs last week",tag:"money"},
+  {text:"Confirm staff handled Farmers order (Mon)",tag:"staff"},
+  {text:"1:1 with Rick — anything he needs?",tag:"staff"},
+  {text:"Review Staff Hub — any staff feedback?",tag:"ops"},
+  {text:"Social media — review/approve posts",tag:"ops"},
+  {text:"Update delivery log",tag:"ops"},
+];
+const MONTHLY_DEFAULT=[
+  {text:"Run monthly P&L review",tag:"money"},
+  {text:"Employee performance check-ins (all 8)",tag:"staff"},
+  {text:"Inventory count — priority SKUs",tag:"ops"},
+  {text:"Retail Pro dead SKU audit",tag:"ops"},
+  {text:"Review & update Staff Hub content",tag:"ops"},
+  {text:"Quarterly estimated taxes (check due date)",tag:"money"},
+  {text:"Review vendor pricing",tag:"money"},
+  {text:"Rick + social media check-in (1st of month)",tag:"staff"},
+  {text:"Check hiring pipeline progress",tag:"hire"},
+];
+const HIRING_DEFAULT=[
+  {text:"Write job description for new hire",tag:"hire"},
+  {text:"Post on Indeed / local Facebook groups",tag:"hire"},
+  {text:"Review any applications received",tag:"hire"},
+  {text:"Schedule interviews for top candidates",tag:"hire"},
+];
+const PROJECTS=[
+  {name:"Staff Hub",status:"active",pct:65,note:"Next: quick-ref cards, weekly summaries",
+   prompt:"I want to continue working on the Foothill Feed Staff Hub (foothill_hub.html). Current progress is 65%. The next items are: printable quick-ref cards for staff and weekly summary features. Please search our past conversations for context and let's pick up where we left off."},
+  {name:"Delivery Day App",status:"active",pct:40,note:"Adding vendors one at a time",
+   prompt:"I want to continue building the Foothill Feed Delivery Day App. It parses vendor invoices, cross-references special orders vs stock, and generates a daily staff report. We've been adding vendors one at a time. Please search our past conversations for context and let's add the next vendor or continue where we left off."},
+  {name:"Employee Performance",status:"active",pct:35,note:"8 profiles, monthly reviews",
+   prompt:"I want to work on the Foothill Feed Employee Performance System. I have 8 employees and we've been building monthly review profiles and a Google Sheet tracker. Please search our past conversations for context and let's continue building this out."},
+  {name:"Employee Handbook",status:"active",pct:20,note:"Foundation in progress",
+   prompt:"I want to continue building the Foothill Feed Employee Handbook. It's about 20% done — foundation in progress. Please search our past conversations for context and let's pick up where we left off."},
+  {name:"Retail Pro Cleanup",status:"active",pct:50,note:"Dead SKU inactivation",
+   prompt:"I want to continue the Retail Pro 9 inventory cleanup at Foothill Feed. We've been working on dead SKU inactivation to preserve sales history. Please search our past conversations for context and let's continue."},
+  {name:"Rivian Decision",status:"pending",pct:70,note:"Clarification chat with Claude pending",
+   prompt:"I want to revisit the Rivian purchase decision for Foothill Feed. I've done research on the R1S and R1T, looked at cash vs finance options, and Section 179 depreciation. I also recently met with my accountant Anna about it and need clarification on what we discussed. Please search our past conversations and let's dig into this."},
+  {name:"Hiring",status:"pending",pct:10,note:"Desperately needed — start here",
+   prompt:"I need help with hiring at Foothill Feed. I desperately need at least one new staff member. I need a second person I can trust like Rick. Let's build a hiring plan — job description, where to post, what to look for, and how to onboard someone into my store culture."},
+  {name:"ListingPro (side biz)",status:"hold",pct:15,note:"On hold until ops stable",
+   prompt:"I want to revisit ListingPro, my Amazon listing optimization side business concept. It had tiered pricing, a landing page, AI-powered listing generator, and an n8n automation pipeline. Please search our past conversations for context and let's see where things stand."},
+];
+const TRIAGE_STEPS=[
+  {label:"Delete / archive junk first",sub:"Newsletters, promos, anything you won't read."},
+  {label:"Flag anything that needs a reply",sub:"Don't reply yet — just flag it."},
+  {label:"Reply to anything under 2 minutes",sub:"Quick yes/no only."},
+  {label:"Add longer replies to today's task list",sub:"Schedule them, don't do them now."},
+  {label:"Check vendor order confirmations",sub:"VSI, Bar Ale, Newco, Phillips, Volkman."},
+  {label:"Check staff messages needing response",sub:"Anything urgent surfaces here."},
+];
+
+
+// ─── DATE HELPERS ──────────────────────────────────────────────
+const dk=()=>new Date().toISOString().slice(0,10);
+const wk=()=>{const d=new Date(),s=new Date(d);s.setDate(d.getDate()-d.getDay());return s.toISOString().slice(0,10);};
+const mk=()=>new Date().toISOString().slice(0,7);
+const uid=()=>Math.random().toString(36).slice(2,8);
+
+const now=new Date(),dow=now.getDay(),dom=now.getDate();
+const isCEO=RICK_DAYS.includes(dow),isWork=dow>=2&&dow<=6;
+
+// ─── SUPABASE HELPERS ──────────────────────────────────────────
+const sbHeaders = {
+  'Content-Type': 'application/json',
+  'apikey': SUPABASE_ANON,
+  'Authorization': `Bearer ${SUPABASE_ANON}`,
+  'Prefer': 'resolution=merge-duplicates'
+};
+
+async function sbGet(table, match) {
+  const params = Object.entries(match).map(([k,v])=>`${k}=eq.${encodeURIComponent(v)}`).join('&');
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}?${params}&limit=1`, { headers: sbHeaders });
+  const rows = await res.json();
+  return Array.isArray(rows) && rows.length > 0 ? rows[0] : null;
+}
+
+async function sbUpsert(table, data) {
+  await fetch(`${SUPABASE_URL}/rest/v1/${table}`, {
+    method: 'POST',
+    headers: { ...sbHeaders, 'Prefer': 'resolution=merge-duplicates' },
+    body: JSON.stringify(data)
+  });
+}
+
+async function sbInsert(table, data) {
+  await fetch(`${SUPABASE_URL}/rest/v1/${table}`, {
+    method: 'POST',
+    headers: sbHeaders,
+    body: JSON.stringify(data)
+  });
+}
+
+async function sbGetMany(table, match, order='captured_at.desc', limit=30) {
+  const params = Object.entries(match).map(([k,v])=>`${k}=eq.${encodeURIComponent(v)}`).join('&');
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}?${params}&order=${order}&limit=${limit}`, { headers: sbHeaders });
+  const rows = await res.json();
+  return Array.isArray(rows) ? rows : [];
+}
+
+async function sbDelete(table, match) {
+  const params = Object.entries(match).map(([k,v])=>`${k}=eq.${encodeURIComponent(v)}`).join('&');
+  await fetch(`${SUPABASE_URL}/rest/v1/${table}?${params}`, { method: 'DELETE', headers: sbHeaders });
+}
+
+// ─── AI PROXY HELPER ───────────────────────────────────────────
+// All Anthropic API calls go through the Edge Function so the API key stays server-side
+async function callAI(payload) {
+  const res = await fetch(PROXY_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-hq-secret': HQ_SECRET },
+    body: JSON.stringify(payload)
+  });
+  return res.json();
+}
+
+// ─── SUPABASE AI CACHE ─────────────────────────────────────────
+async function aiCacheGet(key) {
+  try {
+    const row = await sbGet('hq_ai_cache', { cache_key: key });
+    if (!row) return null;
+    if (new Date(row.expires_at) < new Date()) return null; // expired
+    return row.content;
+  } catch { return null; }
+}
+
+async function aiCacheSet(key, content) {
+  try {
+    await sbUpsert('hq_ai_cache', {
+      cache_key: key,
+      content: typeof content === 'string' ? { text: content } : content,
+      created_at: new Date().toISOString(),
+      expires_at: new Date(Date.now() + 24*60*60*1000).toISOString()
+    });
+  } catch {}
+}
+
+// ─── LOCAL STORAGE FALLBACK ────────────────────────────────────
+// Used while Supabase loads (instant UI) — Supabase is source of truth
+const ld=(k,def)=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):def;}catch{return def;}};
+const sv=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));}catch{}};
+
+// ─── STATE ─────────────────────────────────────────────────────
+function freshDaily(){
+  const tasks=isCEO?CEO_TASKS:FLOOR_TASKS;
+  return{
+    morning:tasks.filter(t=>t.section==='morning').map(t=>({...t,done:false,id:uid()})),
+    ops:tasks.filter(t=>t.section==='ops').map(t=>({...t,done:false,id:uid()})),
+    eod:tasks.filter(t=>t.section==='eod').map(t=>({...t,done:false,id:uid()})),
+    extra:[]
+  };
+}
+
+let state={
+  daily:ld('ff5_daily_'+dk(),null)||freshDaily(),
+  weekly:ld('ff5_weekly_'+wk(),null)||WEEKLY_DEFAULT.map(t=>({...t,done:false,id:uid()})),
+  monthly:ld('ff5_monthly_'+mk(),null)||MONTHLY_DEFAULT.map(t=>({...t,done:false,id:uid()})),
+  hiring:ld('ff5_hiring',null)||HIRING_DEFAULT.map(t=>({...t,done:false,id:uid()})),
+  triage:ld('ff5_triage_'+dk(),null)||TRIAGE_STEPS.map(t=>({...t,done:false,id:uid()})),
+  notes:ld('ff5_notes',[]),
+  focus:ld('ff5_focus_'+dk(),''),
+  skips:ld('ff5_skips_'+wk(),{}),
+  _loaded: false
+};
+
+// ─── PERSIST: local + Supabase ─────────────────────────────────
+function persist(){
+  // Local cache (instant)
+  sv('ff5_daily_'+dk(),state.daily);
+  sv('ff5_weekly_'+wk(),state.weekly);
+  sv('ff5_monthly_'+mk(),state.monthly);
+  sv('ff5_hiring',state.hiring);
+  sv('ff5_triage_'+dk(),state.triage);
+  sv('ff5_notes',state.notes);
+  sv('ff5_skips_'+wk(),state.skips);
+  // Supabase (async, non-blocking)
+  persistToSupabase();
+}
+
+async function persistToSupabase() {
+  try {
+    await Promise.all([
+      sbUpsert('hq_state', { owner: OWNER, scope_key: `daily:${dk()}`,   data: state.daily,   updated_at: new Date().toISOString() }),
+      sbUpsert('hq_state', { owner: OWNER, scope_key: `weekly:${wk()}`,  data: state.weekly,  updated_at: new Date().toISOString() }),
+      sbUpsert('hq_state', { owner: OWNER, scope_key: `monthly:${mk()}`, data: state.monthly, updated_at: new Date().toISOString() }),
+      sbUpsert('hq_state', { owner: OWNER, scope_key: `hiring`,          data: state.hiring,  updated_at: new Date().toISOString() }),
+      sbUpsert('hq_state', { owner: OWNER, scope_key: `triage:${dk()}`,  data: state.triage,  updated_at: new Date().toISOString() }),
+      sbUpsert('hq_state', { owner: OWNER, scope_key: `focus:${dk()}`,   data: { text: state.focus }, updated_at: new Date().toISOString() }),
+      syncSkipsToSupabase()
+    ]);
+  } catch(e) { console.warn('Supabase persist failed (offline?):', e); }
+}
+
+async function syncSkipsToSupabase() {
+  // For vendor skips, upsert each toggle
+  for (const [vendorName, skipped] of Object.entries(state.skips)) {
+    await sbUpsert('hq_vendor_skips', {
+      owner: OWNER,
+      week_key: wk(),
+      vendor_name: vendorName,
+      skipped: !!skipped
+    });
+  }
+}
+
+// ─── LOAD FROM SUPABASE ON STARTUP ────────────────────────────
+// Runs after local state is shown — merges in server state if newer
+async function loadFromSupabase() {
+  try {
+    const [dayRow, weekRow, monthRow, hireRow, triageRow, focusRow, skipRows] = await Promise.all([
+      sbGet('hq_state', { owner: OWNER, scope_key: `daily:${dk()}` }),
+      sbGet('hq_state', { owner: OWNER, scope_key: `weekly:${wk()}` }),
+      sbGet('hq_state', { owner: OWNER, scope_key: `monthly:${mk()}` }),
+      sbGet('hq_state', { owner: OWNER, scope_key: 'hiring' }),
+      sbGet('hq_state', { owner: OWNER, scope_key: `triage:${dk()}` }),
+      sbGet('hq_state', { owner: OWNER, scope_key: `focus:${dk()}` }),
+      sbGetMany('hq_vendor_skips', { owner: OWNER, week_key: wk() }, 'captured_at.desc', 20).catch(()=>[])
+    ]);
+
+    let changed = false;
+
+    if (dayRow?.data)    { state.daily   = dayRow.data;   changed = true; }
+    if (weekRow?.data)   { state.weekly  = weekRow.data;  changed = true; }
+    if (monthRow?.data)  { state.monthly = monthRow.data; changed = true; }
+    if (hireRow?.data)   { state.hiring  = hireRow.data;  changed = true; }
+    if (triageRow?.data) { state.triage  = triageRow.data; changed = true; }
+
+    if (focusRow?.data?.text) {
+      state.focus = focusRow.data.text;
+      const pill = document.getElementById('focusPill');
+      if (pill && state.focus) pill.textContent = state.focus;
+    }
+
+    // Merge vendor skips
+    if (Array.isArray(skipRows) && skipRows.length > 0) {
+      skipRows.forEach(row => {
+        state.skips[row.vendor_name] = row.skipped;
+      });
+      changed = true;
+    }
+
+    // Load notes from hq_notes table
+    const noteRows = await sbGetMany('hq_notes', { owner: OWNER }, 'captured_at.desc', 20);
+    if (noteRows.length > 0) {
+      state.notes = noteRows.map(r => ({
+        id: String(r.id),
+        text: r.note_text,
+        time: new Date(r.captured_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      }));
+      changed = true;
+    }
+
+    if (changed) {
+      renderAll();
+      updateSyncBadge('synced');
+    }
+    state._loaded = true;
+  } catch(e) {
+    console.warn('Supabase load failed (offline?):', e);
+    updateSyncBadge('offline');
+    state._loaded = true;
+  }
+}
+
+function updateSyncBadge(status) {
+  const badge = document.getElementById('syncBadge');
+  if (!badge) return;
+  if (status === 'synced') {
+    badge.textContent = '● Synced';
+    badge.style.color = 'rgba(255,255,255,0.5)';
+  } else if (status === 'offline') {
+    badge.textContent = '○ Offline';
+    badge.style.color = '#f0cb8a';
+  } else if (status === 'saving') {
+    badge.textContent = '↑ Saving…';
+    badge.style.color = 'rgba(255,255,255,0.4)';
+  }
+}
+
+
+// ─── DATE INIT ─────────────────────────────────────────────────
+function initDate(){
+  document.getElementById('topDate').textContent=DAYS[dow]+', '+MONTHS[now.getMonth()]+' '+dom;
+  document.getElementById('briefDay').textContent=DAYS[dow];
+  document.getElementById('briefDate').textContent=MONTHS[now.getMonth()]+' '+dom+', '+now.getFullYear();
+  document.getElementById('briefQuote').textContent=QUOTES[dow];
+
+  const m=document.getElementById('briefMode'),b=document.getElementById('modeBadge');
+  if(isCEO){
+    m.className='brief-mode ceo';m.textContent='🟢 CEO Day — Rick is in. Protect your project time.';
+    b.className='mode-badge mode-ceo';b.textContent='CEO Day';
+  } else {
+    m.className='brief-mode floor';m.textContent='🟡 Floor Day — Run the store. Projects can wait.';
+    b.className='mode-badge mode-floor';b.textContent='Floor Day';
+  }
+
+  const sun=new Date(now);sun.setDate(dom-dow);
+  const sat=new Date(sun);sat.setDate(sun.getDate()+6);
+  document.getElementById('weekLabel').textContent='Wk of '+SHORT_MON[sun.getMonth()]+' '+sun.getDate();
+  document.getElementById('weekRange').textContent=SHORT_MON[sun.getMonth()]+' '+sun.getDate()+' – '+SHORT_MON[sat.getMonth()]+' '+sat.getDate();
+  document.getElementById('monthLabel').textContent=MONTHS[now.getMonth()]+' '+now.getFullYear();
+
+  // Week strip
+  const strip=document.getElementById('weekStrip');strip.innerHTML='';
+  ['Su','Mo','Tu','We','Th','Fr','Sa'].forEach((dn,i)=>{
+    const d=new Date(sun);d.setDate(sun.getDate()+i);
+    const isToday=d.toDateString()===now.toDateString();
+    const isRick=RICK_DAYS.includes(d.getDay());
+    const div=document.createElement('div');
+    div.className='wday'+(isToday?' today':isRick?' rick':'');
+    div.innerHTML='<div class="wdn">'+dn+'</div><div class="wdd">'+d.getDate()+'</div>';
+    strip.appendChild(div);
+  });
+
+  // Vendors
+  renderVendors();
+
+  // Recurring
+  const ra=document.getElementById('recurringAlerts'),rl=document.getElementById('recurringList');
+  ra.innerHTML='';rl.innerHTML='';
+  RECURRING.forEach(r=>{
+    const isDue=r.check(now,dom);
+    if(isDue){
+      const el=document.createElement('div');
+      el.className='alert alert-amber';
+      el.innerHTML='<span class="alert-icon">🔔</span><span><strong>'+r.name+'</strong> — due today</span>';
+      ra.appendChild(el);
+    }
+    const tagStyle={money:'background:var(--amber-pale);color:var(--amber)',staff:'background:var(--blue-pale);color:var(--blue)',ops:'background:var(--green-pale);color:var(--green)'}[r.tag];
+    const row=document.createElement('div');row.className='rec-row';
+    row.innerHTML=`<span class="rec-name">${r.name}</span><span class="rec-when">${r.when}</span><span class="rec-badge" style="${tagStyle}">${isDue?'Due today':'Upcoming'}</span>`;
+    rl.appendChild(row);
+  });
+
+  // Day alert
+  const da=document.getElementById('dayAlerts');da.innerHTML='';
+  if(!isCEO&&isWork){
+    const el=document.createElement('div');
+    el.className='alert alert-amber';
+    el.innerHTML='<span class="alert-icon">💡</span><span>Floor day — save project work for Tuesday or Wednesday.</span>';
+    da.appendChild(el);
+  }
+}
+
+function renderVendors(){
+  document.getElementById('vendorAlerts').innerHTML='';
+  document.getElementById('vendorBody').innerHTML='';
+  const va=document.getElementById('vendorAlerts'),vb=document.getElementById('vendorBody');
+  VENDORS.forEach(v=>{
+    const skipped=v.biweekly&&state.skips[v.name];
+    const daysUntil=(v.day-dow+7)%7;
+    if(!skipped&&daysUntil===0&&!v.staffOwner){const el=document.createElement('div');el.className='alert alert-red';el.innerHTML='<span class="alert-icon">🚨</span><span><strong>'+v.name+'</strong> order due TODAY by '+v.time+'</span>';va.appendChild(el);}
+    else if(!skipped&&daysUntil===0&&v.staffOwner){const el=document.createElement('div');el.className='alert alert-blue';el.innerHTML='<span class="alert-icon">👤</span><span><strong>'+v.name+'</strong> due today — staff handles, confirm it\'s in</span>';va.appendChild(el);}
+    else if(!skipped&&daysUntil===1&&!v.staffOwner){const el=document.createElement('div');el.className='alert alert-amber';el.innerHTML='<span class="alert-icon">⚠️</span><span><strong>'+v.name+'</strong> due TOMORROW by '+v.time+'</span>';va.appendChild(el);}
+    const tr=document.createElement('tr');
+    if(skipped)tr.className='skipped';
+    let dueClass='due-ok',dueText=daysUntil===0?'Today':daysUntil===1?'Tomorrow':'in '+daysUntil+'d';
+    if(skipped){dueClass='due-skip';dueText='Off this wk';}
+    else if(daysUntil===0)dueClass=v.staffOwner?'due-eow':'due-today';
+    else if(daysUntil===1)dueClass='due-soon';
+    else if(daysUntil<=2)dueClass='due-eow';
+    const skipBtn=v.biweekly?`<button class="skip-toggle${skipped?' active':''}" onclick="toggleSkip('${v.name}')">${skipped?'↩ restore':'skip wk'}</button>`:'';
+    tr.innerHTML=`<td><span class="vname">${v.name}</span>${v.staffOwner?'<span class="vstaff">staff</span>':''}${skipBtn}</td><td style="color:var(--ink-light);font-size:11px">${DAYS[v.day]} ${v.time}<br><span style="font-size:10px">${v.freq}</span></td><td><span class="vdue ${dueClass}">${dueText}</span></td>`;
+    vb.appendChild(tr);
+  });
+  document.getElementById('vendorCount').textContent=VENDORS.length+' vendors';
+}
+
+function toggleSkip(name){
+  state.skips[name]=!state.skips[name];
+  persist();
+  renderVendors();
+}
+
+// ─── TASK RENDERING ────────────────────────────────────────────
+function tagClass(tag){return({ops:'tag-ops',staff:'tag-staff',money:'tag-money',urgent:'tag-urgent',hire:'tag-hire'})[tag]||'tag-ops';}
+function tagLabel(tag){return({ops:'Ops',staff:'Staff',money:'Money',urgent:'Urgent',hire:'Hire'})[tag]||tag;}
+
+function renderList(ulId,arr){
+  const ul=document.getElementById(ulId);ul.innerHTML='';
+  arr.forEach((task)=>{
+    const li=document.createElement('li');
+    li.className='task-item'+(task.done?' done':'');
+    li.innerHTML=`<div class="task-check">${task.done?'✓':''}</div><span class="task-text">${task.text}</span><span class="task-tag ${tagClass(task.tag)}">${tagLabel(task.tag)}</span>`;
+    li.onclick=()=>{task.done=!task.done;persist();li.className='task-item'+(task.done?' done':'');li.querySelector('.task-check').textContent=task.done?'✓':'';updateStats();};
+    ul.appendChild(li);
+  });
+}
+
+function renderAll(){
+  renderList('morningList',state.daily.morning);
+  renderList('opsList',[...state.daily.ops,...(state.daily.extra||[])]);
+  renderList('eodList',state.daily.eod);
+  renderList('weeklyList',state.weekly);
+  renderList('monthlyList',state.monthly);
+  renderList('hiringList',state.hiring);
+
+  const tl=document.getElementById('triageList');tl.innerHTML='';
+  state.triage.forEach(step=>{
+    const div=document.createElement('div');
+    div.className='triage-row'+(step.done?' done':'');
+    div.innerHTML=`<div class="triage-check">${step.done?'✓':''}</div><div><div>${step.label}</div><div class="triage-sub">${step.sub}</div></div>`;
+    div.onclick=()=>{step.done=!step.done;persist();div.className='triage-row'+(step.done?' done':'');div.querySelector('.triage-check').textContent=step.done?'✓':'';};
+    tl.appendChild(div);
+  });
+
+  const pl=document.getElementById('projList');pl.innerHTML='';
+  PROJECTS.forEach((p,i)=>{
+    const[cls,lbl]={active:['ps-active','Active'],pending:['ps-pending','Pending'],hold:['ps-hold','On hold']}[p.status]||['ps-active','Active'];
+    const d=document.createElement('div');d.className='proj-item';
+    d.innerHTML=`
+      <div class="proj-header">
+        <span class="proj-name">${p.name}</span>
+        <span class="proj-status ${cls}">${lbl}</span>
+      </div>
+      <div class="proj-bar"><div class="proj-fill" style="width:${p.pct}%"></div></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px">
+        <div class="proj-note">${p.note}</div>
+        <button onclick="launchProject(${i})" style="font-size:10px;padding:2px 9px;border-radius:99px;border:1px solid var(--green-mid);background:var(--green-pale);color:var(--green);cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;margin-left:8px;flex-shrink:0">▶ Continue</button>
+      </div>`;
+    pl.appendChild(d);
+  });
+
+  renderNotes();
+  updateStats();
+}
+
+function updateStats(){
+  const all=[...state.daily.morning,...state.daily.ops,...state.daily.eod,...(state.daily.extra||[])];
+  const dd=all.filter(t=>t.done).length;
+  document.getElementById('statD').textContent=dd+'/'+all.length;
+  document.getElementById('dailyProg').textContent=dd+' of '+all.length+' done';
+  const wd=state.weekly.filter(t=>t.done).length;
+  document.getElementById('statW').textContent=wd+'/'+state.weekly.length;
+  document.getElementById('weeklyProg').textContent=wd+' of '+state.weekly.length;
+}
+
+// ─── TASK ACTIONS ──────────────────────────────────────────────
+function addDaily(){const i=document.getElementById('dailyInput'),t=document.getElementById('dailyTag'),v=i.value.trim();if(!v)return;if(!state.daily.extra)state.daily.extra=[];state.daily.extra.push({text:v,tag:t.value,done:false,id:uid()});persist();i.value='';renderAll();}
+function addWeekly(){const i=document.getElementById('weeklyInput'),v=i.value.trim();if(!v)return;state.weekly.push({text:v,tag:'ops',done:false,id:uid()});persist();i.value='';renderAll();}
+function addMonthly(){const i=document.getElementById('monthlyInput'),v=i.value.trim();if(!v)return;state.monthly.push({text:v,tag:'ops',done:false,id:uid()});persist();i.value='';renderAll();}
+function addHiring(){const i=document.getElementById('hiringInput'),v=i.value.trim();if(!v)return;state.hiring.push({text:v,tag:'hire',done:false,id:uid()});persist();i.value='';renderAll();}
+function resetDaily(){if(!confirm('Reset all daily tasks?'))return;[...state.daily.morning,...state.daily.ops,...state.daily.eod,...(state.daily.extra||[])].forEach(t=>t.done=false);persist();renderAll();}
+function resetTriage(){state.triage.forEach(t=>t.done=false);persist();renderAll();}
+
+// ─── NOTES (Supabase-backed) ───────────────────────────────────
+async function saveNote(){
+  const b=document.getElementById('captureBox'),v=b.value.trim();
+  if(!v)return;
+  const t=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+  const newNote={text:v,time:t,id:uid()};
+  state.notes.unshift(newNote);
+  if(state.notes.length>20)state.notes=state.notes.slice(0,20);
+  b.value='';
+  renderNotes();
+  // Also insert into hq_notes table
+  try {
+    await sbInsert('hq_notes', { owner: OWNER, note_text: v, captured_at: new Date().toISOString() });
+  } catch {}
+  sv('ff5_notes', state.notes);
+}
+
+function renderNotes(){
+  const l=document.getElementById('noteLog');l.innerHTML='';
+  state.notes.slice(0,8).forEach(n=>{
+    const d=document.createElement('div');d.className='note-entry';
+    d.innerHTML=`<span class="note-time">${n.time}</span><span style="flex:1">${n.text}</span><span class="note-del" onclick="delNote('${n.id}')">×</span>`;
+    l.appendChild(d);
+  });
+}
+
+async function delNote(id){
+  state.notes=state.notes.filter(n=>n.id!==id);
+  sv('ff5_notes',state.notes);
+  renderNotes();
+  // Delete from Supabase if it's a numeric ID (Supabase row)
+  if(!isNaN(id)) {
+    try { await sbDelete('hq_notes', { id }); } catch {}
+  }
+}
+
+// ─── PROJECTS ──────────────────────────────────────────────────
+function launchProject(idx) {
+  const p = PROJECTS[idx];
+  if (!p) return;
+  const box = document.getElementById('claudeMsg');
+  box.value = p.prompt;
+  box.focus();
+  box.closest('.card').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  box.style.borderColor = 'var(--green)';
+  box.style.background = 'var(--green-pale)';
+  setTimeout(() => { box.style.borderColor = ''; box.style.background = ''; }, 1800);
+}
+
+function copyToClaude(){
+  const msg=document.getElementById('claudeMsg').value.trim();
+  if(!msg){alert('Type something first!');return;}
+  const full='[From Foothill Feed Daily HQ — '+DAYS[dow]+', '+MONTHS[now.getMonth()]+' '+dom+']\n\n'+msg;
+  navigator.clipboard.writeText(full).then(()=>{
+    const btn=document.getElementById('claudeCopyBtn');
+    const orig=btn.textContent;btn.textContent='✓ Copied!';btn.style.background='#555';
+    setTimeout(()=>{btn.textContent=orig;btn.style.background='';},2500);
+  }).catch(()=>{
+    const ta=document.createElement('textarea');ta.value=full;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);
+    const btn=document.getElementById('claudeCopyBtn');btn.textContent='✓ Copied!';
+    setTimeout(()=>{btn.textContent='📋 Copy message';},2500);
+  });
+}
+
+// Focus pill
+const pill=document.getElementById('focusPill');
+if(state.focus)pill.textContent=state.focus;
+pill.addEventListener('blur',()=>{
+  state.focus=pill.textContent.trim();
+  sv('ff5_focus_'+dk(),state.focus);
+  persistToSupabase();
+});
+pill.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();pill.blur();}});
+
+
+// ─── JEFF'S DAILY MOTIVATION (via proxy) ──────────────────────
+async function loadJeffMotivation() {
+  const cacheKey = 'jeff_mot:' + dk();
+  // Try Supabase cache first
+  const cached = await aiCacheGet(cacheKey);
+  if (cached) {
+    document.getElementById('jeffMotivationText').innerHTML = cached.text || cached;
+    return;
+  }
+  // Also check localStorage as instant fallback
+  const local = localStorage.getItem('ff5_jeff_mot_' + dk());
+  if (local) { document.getElementById('jeffMotivationText').innerHTML = local; }
+  else { document.getElementById('jeffMotivationText').innerHTML = '<span style="color:var(--ink-light);font-size:12px">Loading…</span>'; }
+
+  try {
+    const data = await callAI({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 1000,
+      messages: [{ role: 'user', content: `Write a single short daily motivational message for Jeff Greenfield, owner of Foothill Feed — a boutique retail feed and pet supply store in Loomis, CA. He manages 8 employees, works Tuesday through Saturday, and is actively building systems to grow his store and reduce his personal workload over time. Today is ${DAYS[dow]}, ${MONTHS[now.getMonth()]} ${dom}.
+
+Write ONE genuine, punchy owner-mindset message. 2-3 sentences max. Speak directly to him — not generic inspiration. Rotate themes: leadership, building something lasting, trusting your team, persistence, the reward of doing hard things, delegation, showing up. Reference the day or season naturally if it fits.
+
+No quotes, no attribution, no preamble, no labels. Just the message.` }]
+    });
+    const text = data.content?.[0]?.text || 'You built this from scratch. Keep building.';
+    localStorage.setItem('ff5_jeff_mot_' + dk(), text);
+    await aiCacheSet(cacheKey, { text });
+    document.getElementById('jeffMotivationText').innerHTML = text;
+  } catch(e) {
+    document.getElementById('jeffMotivationText').innerHTML = 'Every great store is built one good day at a time. Make this one count.';
+  }
+}
+
+async function refreshMotivation() {
+  localStorage.removeItem('ff5_jeff_mot_' + dk());
+  await aiCacheSet('jeff_mot:' + dk(), null).catch(()=>{});
+  try { await sbDelete('hq_ai_cache', { cache_key: 'jeff_mot:' + dk() }); } catch {}
+  await loadJeffMotivation();
+}
+
+// ─── STAFF DAILY MOTIVATION (via proxy) ───────────────────────
+async function loadStaffMotivation() {
+  const cacheKey = 'staff_mot:' + dk();
+  const cached = await aiCacheGet(cacheKey);
+  if (cached && cached.headline) {
+    document.getElementById('staffMotivationHeadline').textContent = cached.headline;
+    document.getElementById('staffMotivationSub').textContent = cached.sub;
+    return;
+  }
+  const local = localStorage.getItem('ff5_staff_mot_' + dk());
+  if (local) {
+    try { const p=JSON.parse(local); document.getElementById('staffMotivationHeadline').textContent=p.headline; document.getElementById('staffMotivationSub').textContent=p.sub; return; } catch {}
+  }
+  document.getElementById('staffMotivationHeadline').innerHTML = '<span style="color:var(--ink-light);font-size:12px">Loading…</span>';
+  document.getElementById('staffMotivationSub').textContent = '';
+
+  try {
+    const data = await callAI({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 1000,
+      messages: [{ role: 'user', content: `Write a daily motivational message for the staff at Foothill Feed — a boutique retail feed and pet supply store in Loomis, CA with about 8 employees. Today is ${DAYS[dow]}, ${MONTHS[now.getMonth()]} ${dom}.
+
+Store values: clean and organized, knowledgeable staff, every customer leaves better than they arrived. Owner Jeff models a boutique/Nordstrom service standard.
+
+Return ONLY a raw JSON object — no markdown, no backticks, no explanation:
+{"headline":"Short punchy headline max 8 words no quotes","sub":"1-2 warm genuine sentences supporting the headline specific to retail and this team"}
+
+Rotate themes: teamwork, customer service, taking pride in the store, knowledge, energy, small actions with big impact. Human and genuine, not corporate.` }]
+    });
+    let text = data.content?.[0]?.text || '{}';
+    text = text.replace(/```json|```/g, '').trim();
+    const p = JSON.parse(text);
+    localStorage.setItem('ff5_staff_mot_' + dk(), JSON.stringify(p));
+    await aiCacheSet(cacheKey, p);
+    document.getElementById('staffMotivationHeadline').textContent = p.headline;
+    document.getElementById('staffMotivationSub').textContent = p.sub;
+  } catch(e) {
+    document.getElementById('staffMotivationHeadline').textContent = 'Show up. Do great work. It matters.';
+    document.getElementById('staffMotivationSub').textContent = "Every shift is a chance to make someone's day. Make it count.";
+  }
+}
+
+async function refreshStaffMotivation() {
+  localStorage.removeItem('ff5_staff_mot_' + dk());
+  try { await sbDelete('hq_ai_cache', { cache_key: 'staff_mot:' + dk() }); } catch {}
+  await loadStaffMotivation();
+}
+
+function copyStaffMessage() {
+  const headline = document.getElementById('staffMotivationHeadline').textContent;
+  const sub = document.getElementById('staffMotivationSub').textContent;
+  const msg = `🌿 Foothill Feed · ${DAYS[dow]} ${MONTHS[now.getMonth()]} ${dom}\n\n${headline}\n\n${sub}\n\n— Jeff`;
+  navigator.clipboard.writeText(msg).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = msg; document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
+  });
+  const confirm = document.getElementById('staffCopyConfirm');
+  confirm.style.display = 'flex';
+  setTimeout(() => { confirm.style.display = 'none'; }, 2500);
+}
+
+// ─── AI COACH (via proxy) ──────────────────────────────────────
+let coachHistory = [];
+
+function buildCoachContext() {
+  const dayType = isCEO ? 'CEO Day (Rick is in — project/focus time)' : 'Floor Day (reactive, store coverage)';
+  const allDaily = [...state.daily.morning, ...state.daily.ops, ...state.daily.eod, ...(state.daily.extra||[])];
+  const doneTasks = allDaily.filter(t=>t.done).map(t=>t.text);
+  const pendingTasks = allDaily.filter(t=>!t.done).map(t=>t.text);
+  const urgentVendors = [];
+  VENDORS.forEach(v => {
+    const skipped = v.biweekly && state.skips[v.name];
+    if (skipped) return;
+    const daysUntil = (v.day - dow + 7) % 7;
+    if (daysUntil === 0) urgentVendors.push(v.name + ' (due TODAY by ' + v.time + ')');
+    else if (daysUntil === 1) urgentVendors.push(v.name + ' (due TOMORROW by ' + v.time + ')');
+  });
+  const recurringDue = RECURRING.filter(r => r.check(now, dom)).map(r => r.name);
+
+  return `You are a sharp, no-fluff chief of staff and productivity coach for Jeff Greenfield, owner of Foothill Feed — a retail feed and pet supply store at 3293 Taylor Rd, Loomis CA with ~8 employees.
+
+JEFF'S CONTEXT:
+- Works Tue–Sat. Today is ${DAYS[dow]}, ${MONTHS[now.getMonth()]} ${dom}.
+- Day type: ${dayType}
+- Rick (most trusted employee) is in Tue–Wed mornings only (summer schedule). These are Jeff's CEO/project days.
+- Jeff is reactive by nature and struggles to stay organized across daily ops, staff, and ongoing projects.
+- He is a visual/auditory learner. Keep responses short, structured, and scannable.
+
+TODAY'S TASK STATUS:
+- Pending: ${pendingTasks.length > 0 ? pendingTasks.join(', ') : 'None'}
+- Done: ${doneTasks.length > 0 ? doneTasks.join(', ') : 'None yet'}
+
+URGENT VENDOR DEADLINES:
+${urgentVendors.length > 0 ? urgentVendors.join('\n') : 'None today or tomorrow'}
+
+RECURRING DUE TODAY:
+${recurringDue.length > 0 ? recurringDue.join(', ') : 'None'}
+
+ACTIVE PROJECTS:
+- Staff Hub (65% done) — next: quick-ref cards, weekly summaries
+- Delivery Day App (40%) — adding vendors one at a time
+- Employee Performance System (35%) — 8 staff, monthly reviews
+- Employee Handbook (20%)
+- Retail Pro Cleanup (50%)
+- Rivian Purchase Decision (70%) — pending Anna clarification
+- Hiring (10%) — desperately needed, urgent
+
+YOUR JOB:
+Based on Jeff's answer about what's on his mind, give him:
+1. His TOP 3 priorities for today (numbered, one line each — specific and actionable)
+2. One time-sensitive flag if relevant (bold it)
+3. One thing he can DELEGATE today and to whom
+4. One clear FIRST ACTION to start with RIGHT NOW
+
+Be direct. No fluff. No preamble. Talk to him like you know his business cold — because you do. Max 200 words total. Use short paragraphs or bullets. Never use headers with hashtags — use bold labels instead.`;
+}
+
+async function startCoach(topic) {
+  if (!topic || !topic.trim()) return;
+  document.getElementById('coachBody').style.display = 'none';
+  document.getElementById('coachResponse').style.display = 'block';
+  document.getElementById('coachLoading').style.display = 'block';
+  document.getElementById('coachOutput').innerHTML = '';
+  document.getElementById('coachStatus').textContent = 'Thinking…';
+  coachHistory = [{ role: 'user', content: topic }];
+  try {
+    const data = await callAI({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 1000,
+      system: buildCoachContext(),
+      messages: coachHistory
+    });
+    const reply = data.content?.[0]?.text || 'Something went wrong — try again.';
+    coachHistory.push({ role: 'assistant', content: reply });
+    document.getElementById('coachLoading').style.display = 'none';
+    document.getElementById('coachOutput').innerHTML = formatCoachResponse(reply);
+    document.getElementById('coachStatus').textContent = 'Done';
+  } catch(e) {
+    document.getElementById('coachLoading').style.display = 'none';
+    document.getElementById('coachOutput').innerHTML = '<p style="color:var(--red);font-size:12px">Connection error — check your internet and try again.</p>';
+    document.getElementById('coachStatus').textContent = 'Error';
+  }
+}
+
+async function sendFollowUp() {
+  const input = document.getElementById('followUpInput');
+  const val = input.value.trim();
+  if (!val) return;
+  input.value = '';
+  document.getElementById('followUpBox').style.display = 'none';
+  const prev = document.getElementById('coachOutput').innerHTML;
+  document.getElementById('coachOutput').innerHTML = prev + '<div style="margin-top:12px;padding-top:10px;border-top:1px solid #f0ede8;font-size:12px;color:var(--ink-light);margin-bottom:6px">You: ' + val + '</div><div style="font-size:12px;color:var(--ink-light)">Thinking…</div>';
+  document.getElementById('coachStatus').textContent = 'Thinking…';
+  coachHistory.push({ role: 'user', content: val });
+  try {
+    const data = await callAI({ model: 'claude-sonnet-4-20250514', max_tokens: 1000, system: buildCoachContext(), messages: coachHistory });
+    const reply = data.content?.[0]?.text || 'Something went wrong.';
+    coachHistory.push({ role: 'assistant', content: reply });
+    const newPrev = document.getElementById('coachOutput').innerHTML;
+    const idx = newPrev.lastIndexOf('<div style="font-size:12px;color:var(--ink-light)">Thinking…</div>');
+    document.getElementById('coachOutput').innerHTML = newPrev.slice(0, idx) + '<div style="margin-top:6px">' + formatCoachResponse(reply) + '</div>';
+    document.getElementById('coachStatus').textContent = 'Done';
+  } catch(e) { document.getElementById('coachStatus').textContent = 'Error'; }
+}
+
+function formatCoachResponse(text) {
+  return text
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\n\n/g, '</p><p style="margin-top:8px">')
+    .replace(/\n/g, '<br>')
+    .replace(/^/, '<p>')
+    .replace(/$/, '</p>');
+}
+function resetCoach() {
+  coachHistory = [];
+  document.getElementById('coachBody').style.display = 'block';
+  document.getElementById('coachResponse').style.display = 'none';
+  document.getElementById('coachOutput').innerHTML = '';
+  document.getElementById('coachCustom').value = '';
+  document.getElementById('followUpBox').style.display = 'none';
+  document.getElementById('coachStatus').textContent = 'Ready';
+}
+function askFollowUp() {
+  document.getElementById('followUpBox').style.display = 'block';
+  document.getElementById('followUpInput').focus();
+}
+
+
+// ─── GOOGLE CALENDAR INTEGRATION ──────────────────────────────
+// Calendar still uses Anthropic directly (needs MCP, can't go via Edge Function)
+// This is safe — the Anthropic call with MCP must come from the client side
+const CAL_CACHE_KEY = 'ff5_cal_' + dk();
+
+function classifyEvent(title) {
+  const t = title.toLowerCase();
+  if (t.includes('order') || t.includes('farmers') || t.includes('vsi') || t.includes('bar ale') ||
+      t.includes('newco') || t.includes('phillips') || t.includes('volkman')) return 'vendor-event';
+  if (t.includes('rent') || t.includes('payroll') || t.includes('tax') || t.includes('payment')) return 'money-event';
+  return 'regular-event';
+}
+function formatCalTime(dateStr) {
+  if (!dateStr) return 'All day';
+  const d = new Date(dateStr);
+  let h = d.getHours(), m = d.getMinutes();
+  const ampm = h >= 12 ? 'pm' : 'am';
+  h = h % 12 || 12;
+  return h + (m ? ':' + String(m).padStart(2,'0') : '') + ampm;
+}
+function getDayLabel(dateStr, isAllDay) {
+  const eventDate = new Date(isAllDay ? dateStr + 'T12:00:00' : dateStr);
+  const today = new Date();
+  const diff = Math.round((eventDate.setHours(0,0,0,0) - today.setHours(0,0,0,0)) / 86400000);
+  if (diff === 0) return 'TODAY';
+  if (diff === 1) return 'TOMORROW · ' + ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][new Date(dateStr).getDay()];
+  return ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][new Date(isAllDay ? dateStr + 'T12:00:00' : dateStr).getDay()] +
+    ' · ' + SHORT_MON[new Date(isAllDay ? dateStr + 'T12:00:00' : dateStr).getMonth()] + ' ' +
+    new Date(isAllDay ? dateStr + 'T12:00:00' : dateStr).getDate();
+}
+
+async function loadCalendar(forceRefresh) {
+  if (!forceRefresh) {
+    const cached = localStorage.getItem(CAL_CACHE_KEY);
+    if (cached) { renderCalendar(JSON.parse(cached)); return; }
+  }
+  document.getElementById('calBody').innerHTML = '<div class="cal-loading">⏳ Fetching your calendar…</div>';
+  document.getElementById('calStatus').textContent = 'Loading…';
+  const todayISO = now.toISOString().slice(0,10);
+  const endOfWeek = new Date(now);
+  const daysUntilSat = (6 - dow + 7) % 7 || 7;
+  endOfWeek.setDate(now.getDate() + daysUntilSat);
+  const endISO = endOfWeek.toISOString().slice(0,10);
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: 'You are a calendar assistant. Use the Google Calendar MCP tool to list events for jeff@foothillfeedloomis.com from ' + todayISO + 'T00:00:00-07:00 to ' + endISO + 'T23:59:59-07:00. Return ONLY a raw JSON array of events — no markdown, no explanation. Each event object must have: title (string), start (ISO string), end (ISO string), allDay (boolean). Order by start time ascending. Include all events.',
+        messages: [{ role: 'user', content: 'List all calendar events from ' + todayISO + ' through ' + endISO + ' for jeff@foothillfeedloomis.com. Use the list_events tool with startTime="' + todayISO + 'T00:00:00-07:00" and endTime="' + endISO + 'T23:59:59-07:00" and timeZone="America/Los_Angeles". Return only a JSON array.' }],
+        mcp_servers: [{ type: 'url', url: 'https://calendarmcp.googleapis.com/mcp/v1', name: 'google-calendar' }]
+      })
+    });
+    const data = await res.json();
+    let events = [];
+    for (const block of data.content || []) {
+      if (block.type === 'mcp_tool_result') {
+        try {
+          const raw = block.content?.[0]?.text || '[]';
+          const parsed = JSON.parse(raw);
+          if (parsed.items) {
+            events = parsed.items.map(e => ({
+              title: e.summary || '(No title)',
+              start: e.start?.dateTime || e.start?.date || '',
+              end: e.end?.dateTime || e.end?.date || '',
+              allDay: !!e.start?.date && !e.start?.dateTime
+            }));
+          }
+        } catch(pe) {}
+      } else if (block.type === 'text' && block.text) {
+        const match = block.text.match(/\[[\s\S]*\]/);
+        if (match) { try { events = JSON.parse(match[0]); } catch(pe) {} }
+      }
+    }
+    events.sort((a,b) => new Date(a.start) - new Date(b.start));
+    localStorage.setItem(CAL_CACHE_KEY, JSON.stringify(events));
+    renderCalendar(events);
+  } catch(e) {
+    document.getElementById('calBody').innerHTML = '<div class="cal-error">⚠️ Could not load calendar. Check your connection and try refreshing.</div>';
+    document.getElementById('calStatus').textContent = 'Error';
+  }
+}
+
+function renderCalendar(events) {
+  const body = document.getElementById('calBody');
+  if (!events || events.length === 0) {
+    body.innerHTML = '<div class="cal-empty">No events found this week.</div>';
+    document.getElementById('calStatus').textContent = 'Up to date';
+    return;
+  }
+  const groups = {};
+  events.forEach(e => {
+    const dateKey = (e.allDay ? e.start : e.start.slice(0,10));
+    if (!groups[dateKey]) groups[dateKey] = [];
+    groups[dateKey].push(e);
+  });
+  const todayKey = now.toISOString().slice(0,10);
+  let html = '';
+  Object.keys(groups).sort().forEach(dateKey => {
+    const isToday = dateKey === todayKey;
+    const label = isToday ? 'TODAY' : getDayLabel(groups[dateKey][0].start, groups[dateKey][0].allDay);
+    html += `<div class="cal-day-block"><div class="cal-day-label${isToday ? ' today-label' : ''}">${label}</div>`;
+    groups[dateKey].forEach(e => {
+      const cls = classifyEvent(e.title);
+      const timeStr = e.allDay ? 'All day' : formatCalTime(e.start);
+      html += `<div class="cal-event ${cls}"><span class="cal-event-time">${timeStr}</span><span class="cal-event-title">${e.title}</span></div>`;
+    });
+    html += '</div>';
+  });
+  body.innerHTML = html;
+  document.getElementById('calStatus').textContent = 'Updated ' + new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+}
+
+// ─── STARTUP ───────────────────────────────────────────────────
+initDate();
+renderAll();
+loadCalendar(false);
+
+// Load Supabase data in background — will re-render if server has newer state
+loadFromSupabase().then(() => {
+  loadJeffMotivation();
+  loadStaffMotivation();
+});
+
+</script>
+</body>
+</html>
